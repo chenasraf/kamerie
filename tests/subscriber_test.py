@@ -1,11 +1,9 @@
-import unittest
-
-import zmq
-
-from datetime import datetime, timedelta
 import time
+import unittest
+import zmq
+from datetime import datetime, timedelta
 
-from dispatcher import dispatcher
+from kamerie.dispatcher import dispatcher
 
 
 class SubscriberTest(unittest.TestCase):
