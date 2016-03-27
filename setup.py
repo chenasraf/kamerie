@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(name='kamerie',
       version='0.1',
-      url='https://github.com/chenasraf/kamerie',
+      url='https://github.com/kamerie/kamerie-server',
       license='Apache 2.0',
-      packages=['kameria_media_scanner'],
-      install_requires=['watchdog'],
+      packages=['kameria_server'],
+      install_requires=['pyzmq'],
       zip_safe=False)
