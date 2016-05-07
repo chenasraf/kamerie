@@ -1,10 +1,6 @@
 import os
-
 from pymongo import MongoClient
-
-TYPE_MOVIE = 'movie'
-TYPE_SERIES = 'series'
-
+from kamerie.utilities.consts import TYPE_MOVIE, TYPE_SERIES
 
 class MediaScanner(object):
     def __init__(self, logger):

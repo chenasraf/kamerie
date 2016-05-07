@@ -11,8 +11,8 @@ from os.path import isdir, exists
 import pika
 from bson import json_util
 from kamerie.utilities.utilities import setup_logging
-from kamerie.utilities.consts import DISPATCHER_NAME, EXCHANGE_NAME
-from media_scanner import MediaScanner, TYPE_MOVIE, TYPE_SERIES
+from kamerie.utilities.consts import DISPATCHER_NAME, EXCHANGE_NAME, TYPE_MOVIE, TYPE_SERIES
+from media_scanner import MediaScanner
 
 PLUGIN_DIRECTORY = os.path.join(os.path.dirname(__file__), '../../../kamerie_plugins')
 
