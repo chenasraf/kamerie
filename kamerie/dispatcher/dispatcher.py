@@ -10,9 +10,10 @@ from os.path import isdir, exists
 
 import pika
 from bson import json_util
+from kamerie.dispatcher.utilities import setup_logging
+from template_plugin.consts import DISPATCHER_NAME, EXCHANGE_NAME
 
 from media_scanner import MediaScanner, TYPE_MOVIE, TYPE_SERIES
-from template_plugin.consts import DISPATCHER_NAME, EXCHANGE_NAME
 
 PLUGIN_DIRECTORY = '/home/dor/dev/python/kamerie/kamerie-plugins/'
 
@@ -23,11 +24,9 @@ class Dispatcher(object):
         self.name = DISPATCHER_NAME
 
         # Prepare logger
-        with open('logging.json') as f:
-            # data = json.load(f)
-            logging.basicConfig(level=logging.INFO)
-            self._logger = logging.getLogger(__name__)
-            self._logger.info("Initialized dispatcher")
+        setup_logging()
+        self._logger = logging.getLogger(__name__)
+        self._logger.info("Initialized dispatcher")
 
         self.media_scanner = MediaScanner(self._logger)
         self.plugins = self.register_plugins()

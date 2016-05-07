@@ -1,6 +1,5 @@
 import os
 
-import time
 from pymongo import MongoClient
 
 TYPE_MOVIE = 'movie'
