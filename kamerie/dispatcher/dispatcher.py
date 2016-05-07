@@ -11,7 +11,7 @@ from os.path import isdir, exists
 import pika
 from bson import json_util
 
-from media_scanner import MediaScanner, TYPE_MOVIE
+from media_scanner import MediaScanner, TYPE_MOVIE, TYPE_SERIES
 from template_plugin.consts import DISPATCHER_NAME, EXCHANGE_NAME
 
 PLUGIN_DIRECTORY = '/home/dor/dev/python/kamerie/kamerie-plugins/'
@@ -38,6 +38,7 @@ class Dispatcher(object):
 
         self.channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
         self.on_message({'media_path': '/home/dor/Videos/movies', 'media_type': TYPE_MOVIE})
+        self.on_message({'media_path': '/home/dor/Videos/tv', 'media_type': TYPE_SERIES})
 
     def register_plugins(self):
         plugin_list = []

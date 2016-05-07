@@ -17,11 +17,21 @@ class MediaScanner(object):
             self._logger.error('media_type wrong: %s' % media_type)
             # self._logger.error('media_type wrong: %s' % media_type)
 
+        attributes = {
+            'library_path': directory,
+            'library_type': media_type,
+        }
+        library = self.db.Library.find_one(attributes)
+
+        if library is None:
+            self._logger.info("Adding library: %s" % str(attributes))
+            self.db.Library.insert_one(attributes)
+
         for dirname, dirnames, filenames in os.walk(directory):
             for filename in filenames:
                 attributes = self.parse_file(dirname=dirname, filename=filename, media_type=media_type)
                 yield self.get_db_record(**attributes)
-                time.sleep(2)
+                # time.sleep(2)
 
     def parse_file(self, dirname, filename, media_type):
         self._logger.info('Parsing %s: %s' % (media_type, os.path.join(dirname, filename)))
@@ -33,18 +43,18 @@ class MediaScanner(object):
         }
 
     def get_db_record(self, **attributes):
-        result = self.db.Libraries.find_one({
+        result = self.db.Media.find_one({
             'media_path': attributes['media_path'],
             'media_type': attributes['media_type'],
         })
 
         if result is None:
-            self._logger.info("Adding to library: %s" % str(attributes))
-            result = self.db.Libraries.insert_one(attributes)
-            return self.db.Libraries.find_one({'_id': result.inserted_id})
+            self._logger.info("Adding media: %s" % str(attributes))
+            result = self.db.Media.insert_one(attributes)
+            return self.db.Media.find_one({'_id': result.inserted_id})
         else:
-            self._logger.info("Updating library: %s" % str(attributes))
-            self.db.Libraries.update_one({'_id': result['_id']}, self._attrs_to_db_set(attributes))
+            self._logger.info("Updating media: %s" % str(attributes))
+            self.db.Media.update_one({'_id': result['_id']}, self._attrs_to_db_set(attributes))
             return result
 
     def _attrs_to_db_set(self, attributes):

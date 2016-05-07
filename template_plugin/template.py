@@ -9,7 +9,7 @@ with open('logging.json') as f:
 
 
 class TemplatePlugin(object):
-    def __init__(self, plugin_name):# rabbitmq_settings
+    def __init__(self, plugin_name):
         # Prepare instance
         self.name = plugin_name
 
