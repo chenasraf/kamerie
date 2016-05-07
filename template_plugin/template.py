@@ -1,22 +1,28 @@
 import json
+import logging
 
 import pika
+from template_plugin.consts import EXCHANGE_NAME
+
+with open('logging.json') as f:
+    LOGGING_CONFIG = json.load(f)
 
 
 class TemplatePlugin(object):
-    def __init__(self, plugin_name, logger=None):# rabbitmq_settings
+    def __init__(self, plugin_name):# rabbitmq_settings
         # Prepare instance
         self.name = plugin_name
-        self._logger = logger
-        if self._logger:
-            self._logger.info("Initialized %s plugin" % self.name)
+
+        logging.basicConfig(**LOGGING_CONFIG)
+        self._logger = logging.getLogger(__name__)
+        self._logger.info("Initialized dispatcher")
 
         # Connect to rabbitmq queue
         self._connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self._channel = self._connection.channel()
-        self._channel.exchange_declare(exchange='kamerie-distribute', type='direct')
+        self._channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
         self._channel.queue_declare(queue=self.name)
-        self._channel.queue_bind(queue=self.name, exchange='kamerie-distribute', routing_key='')
+        self._channel.queue_bind(queue=self.name, exchange=EXCHANGE_NAME, routing_key='')
         if self._logger:
             self._logger.info("Established %s's MQ connection" % self.name)
 
@@ -45,5 +51,4 @@ class TemplatePlugin(object):
         self.close()
 
     def close(self):
-        pass
-        # self._connection.close()
+        self._connection.close()

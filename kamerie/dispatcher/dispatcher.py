@@ -9,9 +9,10 @@ from os import listdir
 from os.path import isdir, exists
 
 import pika
+from bson import json_util
 
 from media_scanner import MediaScanner, TYPE_MOVIE
-from template_plugin.consts import DISPATCHER_NAME
+from template_plugin.consts import DISPATCHER_NAME, EXCHANGE_NAME
 
 PLUGIN_DIRECTORY = '/home/dor/dev/python/kamerie/kamerie-plugins/'
 
@@ -22,18 +23,20 @@ class Dispatcher(object):
         self.name = DISPATCHER_NAME
 
         # Prepare logger
-        logging.basicConfig(level=logging.INFO)
-        self._logger = logging.getLogger(__name__)
-        self._logger.info("Initialized dispatcher")
+        with open('logging.json') as f:
+            # data = json.load(f)
+            logging.basicConfig(level=logging.INFO)
+            self._logger = logging.getLogger(__name__)
+            self._logger.info("Initialized dispatcher")
 
-        self.media_scanner = MediaScanner()
+        self.media_scanner = MediaScanner(self._logger)
         self.plugins = self.register_plugins()
 
         # rabbitmq
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self.channel = self.connection.channel()
 
-        self.channel.exchange_declare(exchange='kamerie-distribute', type='direct')
+        self.channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
         self.on_message({'media_path': '/home/dor/Videos/movies', 'media_type': TYPE_MOVIE})
 
     def register_plugins(self):
@@ -50,7 +53,7 @@ class Dispatcher(object):
                     'name': plugin,
                     'path': plugin_path(plugin),
                     'config_path': config_path,
-                    'plugin_cls': config_import.Plugin(plugin, self._logger)
+                    'plugin_cls': config_import.Plugin(plugin)
                 }
                 plugin_list.append(plugin_conf)
 
@@ -62,10 +65,10 @@ class Dispatcher(object):
     def on_message(self, message):
         if isinstance(message, dict) and all(k in ['media_type', 'media_path'] for k in message.keys()):
             if not message.get('scanned', False):
-                self.media_scanner.scan_directory(message['media_path'], message['media_type'])
-                message['scanned'] = True
-
-            self.channel.basic_publish(exchange='kamerie-distribute', routing_key='', body=json.dumps(message))
+                for scanner_message in self.media_scanner.scan_directory(message['media_path'], message['media_type']):
+                    self.channel.basic_publish(exchange=EXCHANGE_NAME, routing_key='', body=json_util.dumps(scanner_message))
+            else:
+                self.channel.basic_publish(exchange=EXCHANGE_NAME, routing_key='', body=json.dumps(message))
             # for plugin in self.plugins:
             #     plugin['plugin_cls']._message_received(message)
         else:
