@@ -7,7 +7,7 @@ setup(
       packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
       platforms='any',
       license='Apache 2.0',
-      install_requires=['pyzmq'],
+      install_requires=['pika'],
       zip_safe=False,
       classifiers=[
           'Programming Language :: Python',

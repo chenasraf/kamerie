@@ -11,6 +11,3 @@ class Model(object):
         self.client = pymongo.MongoClient(MONGO_CONN_STRING)
         self.db = self.client[MONGO_DB]
         self.collection = self.db[self.collection_name]
-
-    def insert(self, **kwargs):
-        self.collection.add_one(**kwargs)
