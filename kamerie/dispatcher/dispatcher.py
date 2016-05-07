@@ -1,14 +1,17 @@
 """
 Dispatcher API daemon
 """
+import imp
+import json
 import logging
+import os
 from os import listdir
 from os.path import isdir, exists
-import os
-import imp
 
+import pika
+
+from media_scanner import MediaScanner, TYPE_MOVIE
 from template_plugin.consts import DISPATCHER_NAME
-
 
 PLUGIN_DIRECTORY = '/home/dor/dev/python/kamerie/kamerie-plugins/'
 
@@ -19,14 +22,19 @@ class Dispatcher(object):
         self.name = DISPATCHER_NAME
 
         # Prepare logger
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO)
         self._logger = logging.getLogger(__name__)
-
         self._logger.info("Initialized dispatcher")
+
+        self.media_scanner = MediaScanner()
         self.plugins = self.register_plugins()
 
-        for plugin in self.plugins:
-            plugin['plugin_cls'].on_message('/home/dor/Videos/movies')
+        # rabbitmq
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.channel = self.connection.channel()
+
+        self.channel.exchange_declare(exchange='kamerie-distribute', type='direct')
+        self.on_message({'media_path': '/home/dor/Videos/movies', 'media_type': TYPE_MOVIE})
 
     def register_plugins(self):
         plugin_list = []
@@ -52,7 +60,16 @@ class Dispatcher(object):
         self._logger.info("Starting" % self.name)
 
     def on_message(self, message):
-        raise NotImplementedError
+        if isinstance(message, dict) and all(k in ['media_type', 'media_path'] for k in message.keys()):
+            if not message.get('scanned', False):
+                self.media_scanner.scan_directory(message['media_path'], message['media_type'])
+                message['scanned'] = True
+
+            self.channel.basic_publish(exchange='kamerie-distribute', routing_key='', body=json.dumps(message))
+            # for plugin in self.plugins:
+            #     plugin['plugin_cls']._message_received(message)
+        else:
+            self._logger.error("Invalid message: %s" % str(message))
 
     def send_message(self, message):
         pass
@@ -61,7 +78,7 @@ class Dispatcher(object):
         self.close()
 
     def close(self):
-        pass
+        self.connection.close()
 
 
 if __name__ == '__main__':
