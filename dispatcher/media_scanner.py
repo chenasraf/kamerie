@@ -1,6 +1,10 @@
 import os
+
 from pymongo import MongoClient
-from kamerie.utilities.consts import TYPE_MOVIE, TYPE_SERIES
+
+from kamerie.utilities.consts import TYPE_MOVIE, TYPE_SERIES, LIBRARY_PATH, LIBRARY_TYPE, MEDIA_PATH, MEDIA_TYPE, \
+    SCANNED
+
 
 class MediaScanner(object):
     def __init__(self, logger):
@@ -10,11 +14,10 @@ class MediaScanner(object):
     def scan_directory(self, directory, media_type):
         if media_type not in [TYPE_MOVIE, TYPE_SERIES]:
             self._logger.error('media_type wrong: %s' % media_type)
-            # self._logger.error('media_type wrong: %s' % media_type)
 
         attributes = {
-            'library_path': directory,
-            'library_type': media_type,
+            LIBRARY_PATH: directory,
+            LIBRARY_TYPE: media_type,
         }
         library = self.db.Library.find_one(attributes)
 
@@ -26,21 +29,19 @@ class MediaScanner(object):
             for filename in filenames:
                 attributes = self.parse_file(dirname=dirname, filename=filename, media_type=media_type)
                 yield self.get_db_record(**attributes)
-                # time.sleep(2)
 
     def parse_file(self, dirname, filename, media_type):
         self._logger.info('Parsing %s: %s' % (media_type, os.path.join(dirname, filename)))
-        # self._logger.info('parsing %s: %s' % media_type, os.path.join(dirname, file))
         return {
-            'media_path': os.path.join(dirname, filename),
-            'media_type': media_type,
-            'scanned': True,
+            MEDIA_PATH: os.path.join(dirname, filename),
+            MEDIA_TYPE: media_type,
+            SCANNED: True,
         }
 
     def get_db_record(self, **attributes):
         result = self.db.Media.find_one({
-            'media_path': attributes['media_path'],
-            'media_type': attributes['media_type'],
+            MEDIA_PATH: attributes[MEDIA_PATH],
+            MEDIA_TYPE: attributes[MEDIA_TYPE],
         })
 
         if result is None:
