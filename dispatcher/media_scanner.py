@@ -1,14 +1,14 @@
 import os
-
 from pymongo import MongoClient
 
 from kamerie.utilities.consts import TYPE_MOVIE, TYPE_SERIES, LIBRARY_PATH, LIBRARY_TYPE, MEDIA_PATH, MEDIA_TYPE, \
     SCANNED, MEDIA_FILE_EXTENSIONS
+from kamerie.utilities.db import db, attrs_to_db_set
 
 
 class MediaScanner(object):
     def __init__(self, logger):
-        self.db = MongoClient('mongodb://localhost:27017').kamerie
+        self.db = db
         self._logger = logger
 
     def scan_directory(self, directory, media_type):
@@ -53,15 +53,5 @@ class MediaScanner(object):
             return self.db.Media.find_one({'_id': result.inserted_id})
         else:
             self._logger.info("Updating media: %s" % str(attributes))
-            self.db.Media.update_one({'_id': result['_id']}, self._attrs_to_db_set(attributes))
+            self.db.Media.update_one({'_id': result['_id']}, attrs_to_db_set(attributes))
             return result
-
-    def _attrs_to_db_set(self, attributes):
-        setter = {
-            '$set': {},
-            '$currentDate': {'lastModified': True}
-        }
-        for key, value in attributes.iteritems():
-            setter['$set'][key] = value
-
-        return setter
