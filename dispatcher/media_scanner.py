@@ -3,7 +3,7 @@ import os
 from pymongo import MongoClient
 
 from kamerie.utilities.consts import TYPE_MOVIE, TYPE_SERIES, LIBRARY_PATH, LIBRARY_TYPE, MEDIA_PATH, MEDIA_TYPE, \
-    SCANNED
+    SCANNED, MEDIA_FILE_EXTENSIONS
 
 
 class MediaScanner(object):
@@ -27,11 +27,14 @@ class MediaScanner(object):
 
         for dirname, dirnames, filenames in os.walk(directory):
             for filename in filenames:
-                attributes = self.parse_file(dirname=dirname, filename=filename, media_type=media_type)
-                yield self.get_db_record(**attributes)
+                if filename.lower().endswith(MEDIA_FILE_EXTENSIONS):
+                    self._logger.info('Parsing %s: %s' % (media_type, os.path.join(dirname, filename)))
+                    attributes = self.parse_file(dirname=dirname, filename=filename, media_type=media_type)
+                    yield self.get_db_record(**attributes)
+                else:
+                    self._logger.info('Ignoring %s: %s' % (media_type, os.path.join(dirname, filename)))
 
     def parse_file(self, dirname, filename, media_type):
-        self._logger.info('Parsing %s: %s' % (media_type, os.path.join(dirname, filename)))
         return {
             MEDIA_PATH: os.path.join(dirname, filename),
             MEDIA_TYPE: media_type,

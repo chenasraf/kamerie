@@ -2,13 +2,12 @@
 Dispatcher API daemon
 """
 import json
-
 import pika
 from bson import json_util
 
 import kamerie_plugins
 from kamerie.utilities.consts import DISPATCHER_NAME, EXCHANGE_NAME, MEDIA_KEYS, SCANNED, \
-    MEDIA_PATH, MEDIA_TYPE
+    MEDIA_PATH, MEDIA_TYPE, TYPE_MOVIE, TYPE_SERIES
 from kamerie.utilities.utilities import get_logger
 from media_scanner import MediaScanner
 
@@ -23,7 +22,13 @@ class Dispatcher(object):
         self._logger.info("Initialized dispatcher")
 
         self.media_scanner = MediaScanner(self._logger)
-        self.plugins = kamerie_plugins.register_plugins()
+
+        try:
+            self.plugins = kamerie_plugins.register_plugins()
+
+        except ImportError as e:
+            self._logger.error(e)
+            self.plugins = []
 
         # rabbitmq
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
@@ -31,7 +36,7 @@ class Dispatcher(object):
         self._logger.info('Connected to RabbitMQ successfully')
 
         self.channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
-        # self.on_message({'media_path': '/home/dor/Videos/movies', 'media_type': TYPE_MOVIE})
+        self.on_message({'media_path': '/Users/chenasraf/Movies/TV', 'media_type': TYPE_SERIES})
         # self.on_message({'media_path': '/home/dor/Videos/tv', 'media_type': TYPE_SERIES})
 
     def start(self):
