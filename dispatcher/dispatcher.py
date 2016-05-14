@@ -36,7 +36,7 @@ class Dispatcher(object):
         self._logger.info('Connected to RabbitMQ successfully')
 
         self.channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
-        self.on_message({'media_path': '/Users/chenasraf/Movies/TV', 'media_type': TYPE_SERIES})
+        # self.on_message({'media_path': '/Users/chenasraf/Movies/TV', 'media_type': TYPE_SERIES})
         # self.on_message({'media_path': '/home/dor/Videos/tv', 'media_type': TYPE_SERIES})
 
     def start(self):
