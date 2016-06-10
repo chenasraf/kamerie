@@ -7,11 +7,11 @@ from time import sleep
 import pika
 from bson import json_util
 
-from plugin_manager import PluginManager
 from kamerie.utilities.consts import DISPATCHER_NAME, EXCHANGE_NAME, MEDIA_KEYS, SCANNED, \
-    MEDIA_PATH, MEDIA_TYPE, TYPE_MOVIE, TYPE_SERIES
+    MEDIA_PATH, MEDIA_TYPE
 from kamerie.utilities.utilities import get_logger
 from media_scanner import MediaScanner
+from plugin_manager import PluginManager
 
 
 class Dispatcher(object):
@@ -33,10 +33,9 @@ class Dispatcher(object):
         self._logger.info('Connected to RabbitMQ successfully')
 
         self.channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
-        # self.on_message({'media_path': '/home/dor/Videos/movies', 'media_type': TYPE_MOVIE})
-        # self.on_message({'media_path': '/home/dor/Videos/tv', 'media_type': TYPE_SERIES})
 
-        self.plugin_manager.add_plugin('metadata_fetcher')
+        # self.plugin_manager.add_plugin('metadata_fetcher')
+        self.plugin_manager.add_plugin('subtitle_downloader')
 
     def start(self):
         self._logger.info("Starting" % self.name)
