@@ -33,10 +33,11 @@ class Dispatcher(object):
         self._logger.info('Connected to RabbitMQ successfully')
 
         self.channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
-        # self.on_message({'media_path': '/home/dor/Videos/movies', 'media_type': TYPE_MOVIE})
-        # self.on_message({'media_path': '/home/dor/Videos/tv', 'media_type': TYPE_SERIES})
+        # self.on_message({MEDIA_PATH: '/Users/chenasraf/Movies/Movies', MEDIA_TYPE: TYPE_MOVIE})
+        # self.on_message({MEDIA_PATH: '/Users/chenasraf/Movies/TV', MEDIA_TYPE: TYPE_SERIES})
+        # self.on_message({MEDIA_PATH: '/home/dor/Videos/tv', MEDIA_TYPE: TYPE_SERIES})
 
-        self.plugin_manager.add_plugin('metadata_fetcher')
+        # self.plugin_manager.add_plugin('metadata_fetcher')
 
     def start(self):
         self._logger.info("Starting" % self.name)

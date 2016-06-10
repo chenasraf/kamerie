@@ -14,12 +14,11 @@ class PluginManager(object):
         self.plugin_dir = plugin_dir
         self.plugins = {}
 
-        if not os.path.exists(pid_dir) or not os.path.isdir(pid_dir):
-            os.makedirs(pid_dir)
+        # TODO: take care of plugins dir - separate built-ins and downloaded
+        for p in [pid_dir, plugin_dir]:
+            if not os.path.exists(p) or not os.path.isdir(p):
+                os.makedirs(p)
 
-        if not os.path.exists(plugin_dir) or not os.path.isdir(plugin_dir):
-            os.makedirs(plugin_dir)
-            
         # self.plugins = {
         #        "plugin1": <pid1>,
         #        "plugin2": <pid2>
