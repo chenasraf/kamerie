@@ -35,7 +35,7 @@ class Dispatcher(object):
         self.channel.exchange_declare(exchange=EXCHANGE_NAME, type='direct')
 
         # self.plugin_manager.add_plugin('metadata_fetcher')
-        self.plugin_manager.add_plugin('subtitle_downloader')
+        # self.plugin_manager.add_plugin('subtitle_downloader')
 
     def start(self):
         self._logger.info("Starting" % self.name)
