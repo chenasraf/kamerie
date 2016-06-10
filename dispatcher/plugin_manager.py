@@ -19,6 +19,9 @@ class PluginManager(object):
             if not os.path.exists(p) or not os.path.isdir(p):
                 os.makedirs(p)
 
+        if not os.path.exists(plugin_dir) or not os.path.isdir(plugin_dir):
+            os.makedirs(plugin_dir)
+
         # self.plugins = {
         #        "plugin1": <pid1>,
         #        "plugin2": <pid2>
@@ -50,7 +53,7 @@ class PluginManager(object):
     def _validate_plugin(self, name):
         package_path = os.path.join(self.plugin_dir, name)
         plugin_path = os.path.join(package_path, DEFAULT_MAIN_MODULE)
-        if os.path.exists(package_path) and  os.path.isdir(package_path) and os.path.exists(plugin_path):
+        if os.path.exists(package_path) and os.path.isdir(package_path) and os.path.exists(plugin_path):
             return plugin_path
         else:
             raise IOError('plugin directory unavailable.\n\t(package: %s\n\tmodule: %s)' % (package_path, plugin_path))
