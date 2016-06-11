@@ -5,6 +5,7 @@ import json
 from time import sleep
 import pika
 from bson import json_util
+import socket
 
 from kamerie.utilities.consts import DISPATCHER_NAME, EXCHANGE_NAME, MEDIA_KEYS, SCANNED, \
     MEDIA_PATH, MEDIA_TYPE
