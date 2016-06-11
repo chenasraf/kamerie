@@ -8,7 +8,7 @@ from bson import json_util
 import socket
 
 from kamerie.utilities.consts import DISPATCHER_NAME, EXCHANGE_NAME, MEDIA_KEYS, SCANNED, \
-    MEDIA_PATH, MEDIA_TYPE
+    MEDIA_PATH, MEDIA_TYPE, TYPE_MOVIE, TYPE_SERIES
 from kamerie.utilities.utilities import get_logger
 from media_scanner import MediaScanner
 from plugin_manager import PluginManager
