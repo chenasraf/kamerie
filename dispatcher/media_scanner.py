@@ -1,5 +1,4 @@
 import os
-from pymongo import MongoClient
 
 from kamerie.utilities.consts import TYPE_MOVIE, TYPE_SERIES, LIBRARY_PATH, LIBRARY_TYPE, MEDIA_PATH, MEDIA_TYPE, \
     SCANNED, MEDIA_FILE_EXTENSIONS
